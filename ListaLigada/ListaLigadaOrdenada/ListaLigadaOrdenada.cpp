@@ -1,7 +1,6 @@
 #include <iostream>
 using namespace std;
 
-// definicao de tipo
 struct NO {
 	int valor;
 	NO* prox;
@@ -9,7 +8,7 @@ struct NO {
 
 NO* primeiro = NULL;
 
-// headers
+// Headers
 void menu();
 void inicializar();
 void exibirQuantidadeElementos();
@@ -17,9 +16,8 @@ void exibirElementos();
 void inserirElemento();
 void excluirElemento();
 void buscarElemento();
-NO* posicaoElemento(int numero);
-//--------------------------
 
+//--------------------------
 
 int main()
 {
@@ -30,7 +28,7 @@ void menu()
 {
 	int op = 0;
 	while (op != 7) {
-		system("cls"); // somente no windows
+		system("cls");
 		cout << "Menu Lista Ligada";
 		cout << endl << endl;
 		cout << "1 - Inicializar Lista \n";
@@ -46,54 +44,37 @@ void menu()
 
 		switch (op)
 		{
-		case 1: inicializar();
-			break;
-		case 2: exibirQuantidadeElementos();
-			break;
-		case 3: exibirElementos();
-			break;
-		case 4: buscarElemento();
-			break;
-		case 5: inserirElemento();
-			break;
-		case 6: excluirElemento();
-			break;
-		case 7:
-			return;
-		default:
-			break;
+		case 1: inicializar(); break;
+		case 2: exibirQuantidadeElementos(); break;
+		case 3: exibirElementos(); break;
+		case 4: buscarElemento(); break;
+		case 5: inserirElemento(); break;
+		case 6: excluirElemento(); break;
+		case 7: return;
+		default: break;
 		}
 
-		system("pause"); // somente no windows
+		system("pause");
 	}
 }
 
 void inicializar()
 {
-	// se a lista já possuir elementos
-// libera a memoria ocupada
-	NO* aux = primeiro;
-	while (aux != NULL) {
+	for (NO* aux = primeiro; aux != NULL; ) {
 		NO* paraExcluir = aux;
 		aux = aux->prox;
 		free(paraExcluir);
 	}
-
 	primeiro = NULL;
 	cout << "Lista inicializada \n";
-
 }
 
 void exibirQuantidadeElementos() {
-
 	int nElementos = 0;
-	NO* aux = primeiro;
-	while (aux != NULL) {
+	for (NO* aux = primeiro; aux != NULL; aux = aux->prox) {
 		nElementos++;
-		aux = aux->prox;
 	}
 	cout << "Quantidade de elementos: " << nElementos << endl;
-
 }
 
 void exibirElementos()
@@ -102,52 +83,95 @@ void exibirElementos()
 		cout << "Lista vazia \n";
 		return;
 	}
-	else {
-		cout << "Elementos: \n";
-		NO* aux = primeiro;
-		while (aux != NULL) {
-			cout << aux->valor << endl;
-			aux = aux->prox;
-		}
+	cout << "Elementos: \n";
+	for (NO* aux = primeiro; aux != NULL; aux = aux->prox) {
+		cout << aux->valor << endl;
 	}
 }
 
 void inserirElemento()
 {
-	// aloca memoria dinamicamente para o novo elemento
+	int valor;
+	cout << "Digite o elemento: ";
+	cin >> valor;
+
 	NO* novo = (NO*)malloc(sizeof(NO));
-	if (novo == NULL)
-	{
+	if (novo == NULL) return;
+	novo->valor = valor;
+	novo->prox = NULL;
+
+	if (primeiro == NULL || valor < primeiro->valor) {
+		if (primeiro != NULL && primeiro->valor == valor) {
+			cout << "Elemento ja existe!\n";
+			free(novo);
+			return;
+		}
+		novo->prox = primeiro;
+		primeiro = novo;
 		return;
 	}
 
-	cout << "Digite o elemento: ";
-	cin >> novo->valor;
-	novo->prox = NULL;
-
-	if (primeiro == NULL)
-	{
-		primeiro = novo;
-	}
-	else
-	{
-		// procura o final da lista
-		NO* aux = primeiro;
-		while (aux->prox != NULL) {
-			aux = aux->prox;
+	for (NO* atual = primeiro; atual != NULL; atual = atual->prox) {
+		if (atual->prox == NULL || atual->prox->valor > valor) {
+			if (atual->valor == valor || (atual->prox != NULL && atual->prox->valor == valor)) {
+				cout << "Elemento ja existe!\n";
+				free(novo);
+				return;
+			}
+			novo->prox = atual->prox;
+			atual->prox = novo;
+			return;
 		}
-		aux->prox = novo;
 	}
-}
-
-void excluirElemento()
-{
-
 }
 
 void buscarElemento()
 {
+	if (primeiro == NULL) {
+		cout << "Lista vazia\n";
+		return;
+	}
 
+	int valor;
+	cout << "Digite o valor a buscar: ";
+	cin >> valor;
+
+	for (NO* aux = primeiro; aux != NULL && aux->valor <= valor; aux = aux->prox) {
+		if (aux->valor == valor) {
+			cout << "Elemento encontrado\n";
+			return;
+		}
+	}
+	cout << "Elemento nao encontrado\n";
 }
 
+void excluirElemento()
+{
+	if (primeiro == NULL) {
+		cout << "Lista vazia\n";
+		return;
+	}
 
+	int valor;
+	cout << "Digite o valor a excluir: ";
+	cin >> valor;
+
+	if (primeiro->valor == valor) {
+		NO* paraExcluir = primeiro;
+		primeiro = primeiro->prox;
+		free(paraExcluir);
+		cout << "Elemento excluido\n";
+		return;
+	}
+
+	for (NO* atual = primeiro; atual->prox != NULL && atual->prox->valor <= valor; atual = atual->prox) {
+		if (atual->prox->valor == valor) {
+			NO* paraExcluir = atual->prox;
+			atual->prox = atual->prox->prox;
+			free(paraExcluir);
+			cout << "Elemento excluido\n";
+			return;
+		}
+	}
+	cout << "Elemento nao encontrado\n";
+}
